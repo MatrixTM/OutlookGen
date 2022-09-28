@@ -1,0 +1,33 @@
+{
+  "Common": {
+    "Prefix": "&beGen&5>> ",
+    "ProxyFile": "proxy.txt",
+    "OutputFile": "account.txt",
+    "Timer": true,
+    "driverPath": "./chromedriver"
+  },
+  "Captcha": {
+    "providers": "anycaptcha/twocaptcha",
+    "api_key": "",
+    "site_key": "B7D8911C-5CC8-A9A3-35B0-554ACEE604DA"
+  },
+  "EmailInfo": {
+    "Domain": "@hotmail.com/@outlook.com",
+    "minBirthDate": 1980,
+    "maxBirthDate": 1999,
+    "PasswordLength": 10,
+    "FirstNameLength": 5,
+    "LastNameLength": 5
+  },
+  "DriverArguments": [
+    "--disable-logging",
+    "--disable-login-animations",
+    "--disable-notifications",
+    "--incognito",
+    "--ignore-certificate-errors",
+    "--disable-blink-features=AutomationControlled",
+    "--disable-gpu",
+    "--headless",
+    "--no-sandbox"
+  ]
+}

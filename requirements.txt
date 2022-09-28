@@ -1,0 +1,8 @@
+git+https://github.com/Its-Vichy/PyTerm.git
+selenium==4.4.3
+six~=1.16.0
+requests~=2.28.1
+unique-names-generator~=1.0.2
+colorama==0.4.5
+tqdm==4.64.1
+twocaptcha==0.0.1
