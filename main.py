@@ -193,7 +193,8 @@ class eGen:
             objectMonth = Select(birthMonth)
             objectMonth.select_by_value(str(randint(1, 28)))
             birthYear = self.fElement(driver, By.ID, "BirthYear")
-            birthYear.send_keys(str(randint(1980, 1999)))
+            birthYear.send_keys(
+                str(randint(self.config['EmailInfo']['minBirthDate'], self.config['EmailInfo']['maxBirthDate'])))
             self.fElement(driver, By.ID, 'iSignupAction').click()
             driver.switch_to.frame(self.fElement(driver, By.ID, 'enforcementFrame'))
             token = self.solver(driver.current_url, self.driver)
