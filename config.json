@@ -3,8 +3,7 @@
     "Prefix": "&beGen&5>> ",
     "ProxyFile": "proxy.txt",
     "OutputFile": "account.txt",
-    "Timer": true,
-    "driverPath": "./chromedriver"
+    "Timer": true
   },
   "Captcha": {
     "providers": "anycaptcha/twocaptcha",

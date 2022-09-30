@@ -9,15 +9,15 @@ from PyTerm import Console
 from colorama import Fore
 from selenium import webdriver
 from selenium.webdriver import Proxy
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.proxy import ProxyType
 from selenium.webdriver.support.select import Select
+from tqdm import tqdm
 from twocaptcha import TwoCaptcha
+
 import anycaptcha
 from Utils import Utils, Timer
-from tqdm import tqdm
 
 # Some Value
 eGenerated = 0
@@ -26,36 +26,18 @@ solvedCaptcha = 0
 
 class eGen:
     def __init__(self):
-        Console.clear()
         self.Utils = Utils()  # Utils Module
         self.config: Any = load(open('config.json'))  # Config File
         self.checkConfig()  # Check Config File
         self.options = webdriver.ChromeOptions()  # Driver Options
         self.Timer = Timer()  # Timer
 
-        self.colors = {
-            '&a': Fore.LIGHTGREEN_EX,
-            '&4': Fore.RED,
-            '&2': Fore.GREEN,
-            '&b': Fore.LIGHTCYAN_EX,
-            '&c': Fore.LIGHTRED_EX,
-            '&6': Fore.LIGHTYELLOW_EX,
-            '&f': Fore.RESET,
-            '&e': Fore.LIGHTYELLOW_EX,
-            '&3': Fore.CYAN,
-            '&1': Fore.BLUE,
-            '&9': Fore.LIGHTBLUE_EX,
-            '&5': Fore.MAGENTA,
-            '&d': Fore.LIGHTMAGENTA_EX,
-            '&8': Fore.LIGHTBLACK_EX,
-            '&0': Fore.BLACK}  # Colors
-
         self.driver = None
         self.capabilities = None
         self.first_name = None  # Generate First Name
         self.last_name = None  # Generate Last Name
         self.password = None  # Generate Password
-        self.email = self.Utils.eGen()  # Generate Email
+        self.email = None  # Generate Email
 
         # Values About Captcha
         self.providers = self.config['Captcha']['providers']
@@ -63,7 +45,6 @@ class eGen:
         self.site_key = self.config["Captcha"]["site_key"]
 
         # Other
-        self.service = Service(self.config['Common']['driverPath'])
         self.proxies = [i.strip() for i in open(self.config['Common']['ProxyFile']).readlines()]  # Get Proxies
         for arg in tqdm(self.config["DriverArguments"], desc='Loading Arguments',
                         bar_format='{desc} | {l_bar}{bar:15} | {percentage:3.0f}%'):  # Get Driver Arguments
@@ -137,6 +118,7 @@ class eGen:
 
     def generate_info(self):
         # Generate Information Function
+        self.email = self.Utils.eGen()
         self.password = self.Utils.makeString(self.config["EmailInfo"]["PasswordLength"])  # Generate Password
         self.first_name = self.Utils.makeString(self.config["EmailInfo"]["FirstNameLength"])  # Generate First Name
         self.last_name = self.Utils.makeString(self.config["EmailInfo"]["LastNameLength"])  # Generate Last Name
@@ -151,13 +133,30 @@ class eGen:
 
     def print(self, text: object, end: str = "\n"):
         # Print With Prefix Function
-        print(self.Utils.replace(f"{self.config['Common']['Prefix']}&f{text}", self.colors), end=end)
+        print(self.Utils.replace(f"{self.config['Common']['Prefix']}&f{text}",
+                                 {
+                                     '&a': Fore.LIGHTGREEN_EX,
+                                     '&4': Fore.RED,
+                                     '&2': Fore.GREEN,
+                                     '&b': Fore.LIGHTCYAN_EX,
+                                     '&c': Fore.LIGHTRED_EX,
+                                     '&6': Fore.LIGHTYELLOW_EX,
+                                     '&f': Fore.RESET,
+                                     '&e': Fore.LIGHTYELLOW_EX,
+                                     '&3': Fore.CYAN,
+                                     '&1': Fore.BLUE,
+                                     '&9': Fore.LIGHTBLUE_EX,
+                                     '&5': Fore.MAGENTA,
+                                     '&d': Fore.LIGHTMAGENTA_EX,
+                                     '&8': Fore.LIGHTBLACK_EX,
+                                     '&0': Fore.BLACK}), end=end)
 
     def CreateEmail(self, driver: WebDriver):
         # Create Email Function
         try:
             global eGenerated, solvedCaptcha
             self.update()
+            driver.set_page_load_timeout(5)
             self.Timer.start(time.time()) if self.config["Common"]['Timer'] else ''
             driver.get("https://outlook.live.com/owa/?nlp=1&signup=1")
             assert 'Create' in driver.title
@@ -212,21 +211,21 @@ class eGen:
         except KeyboardInterrupt:
             driver.quit()
             sys.exit()
-        except Exception as exp:
-            self.print(exp)
+        except:
+            self.print('&4Something is wrong :(')
+        finally:
+            driver.quit()
 
     def run(self):
         # Run Script Function
-        Console.clear()
-        self.print('Coded with <3 by MatrixTeam')
+        self.print('&bCoded with &c<3&b by MatrixTeam')
         while True:
             self.generate_info()
             proxy = choice(self.proxies)  # Select Proxy
             self.print(proxy)
             self.capabilities = webdriver.DesiredCapabilities.CHROME  # Driver Capabilities
             self.create_proxy(proxy).add_to_capabilities(self.capabilities)
-            self.CreateEmail(driver=webdriver.Chrome(options=self.options, desired_capabilities=self.capabilities,
-                                                     service=self.service))
+            self.CreateEmail(driver=webdriver.Chrome(options=self.options, desired_capabilities=self.capabilities))
 
 
 if __name__ == '__main__':
