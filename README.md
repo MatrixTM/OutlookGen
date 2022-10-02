@@ -1,4 +1,4 @@
-<p align="center"><img src="https://user-images.githubusercontent.com/95581741/192682206-6a7adbfb-38d8-4466-9ff8-cb900d98151a.png" alt="outlook"></p>
+<p align="center"><img src="images/01.png" alt="outlook"></p>
 <div align="center" style="margin-top: 0;">
    <h1>Outlook Generator</h1>
    <p>Dont Skid 👀</p>
@@ -13,7 +13,7 @@
 
 ---
 
-<p align="center"><img src="https://user-images.githubusercontent.com/95581741/192341106-89bf0a97-d974-4e41-866e-8e334a0b6ed5.png" width="570" alt="outlook"></p>
+<p align="center"><img src="images/02.png" width="570" alt="outlook"></p>
 
 ## 📝 Document
 
