@@ -17,7 +17,9 @@
 
 ## 📝 Document
 
+### Use Http proxies
 ### Before Run [Check Here](#config_doc)
+
 
 **Install Requirements**
 

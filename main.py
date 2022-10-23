@@ -8,10 +8,8 @@ from typing import Any
 from PyTerm import Console
 from colorama import Fore
 from selenium import webdriver
-from selenium.webdriver import Proxy
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.proxy import ProxyType
 from selenium.webdriver.support.select import Select
 from tqdm import tqdm
 from twocaptcha import TwoCaptcha
@@ -56,15 +54,6 @@ class eGen:
         self.options.add_experimental_option('excludeSwitches', ['enable-logging'])
         self.options.add_experimental_option('useAutomationExtension', False)
 
-    @staticmethod
-    def create_proxy(proxy: str):
-        # Make Proxy Function
-        proxy_core = Proxy()
-        proxy_core.proxyType = ProxyType.MANUAL
-        proxy_core.httpProxy = proxy
-        proxy_core.sslProxy = proxy
-        return proxy_core
-
     def solver(self, site_url, browser):
         # Solve Captcha Function
         global solvedCaptcha
@@ -75,7 +64,7 @@ class eGen:
             except Exception as exp:
                 self.print(exp)
 
-        # AnyCaptcha
+            # AnyCaptcha
         elif self.providers == 'anycaptcha':
             client = anycaptcha.AnycaptchaClient(self.api_key)
             task = anycaptcha.FunCaptchaProxylessTask(site_url, self.site_key)
@@ -89,6 +78,7 @@ class eGen:
             else:
                 solvedCaptcha += 1
                 return result
+
 
     def fElement(self, driver: WebDriver, by: By = By.ID, value=None, delay: float = 0.3):
         # Custom find Element Function
@@ -223,8 +213,7 @@ class eGen:
             self.generate_info()
             proxy = choice(self.proxies)  # Select Proxy
             self.print(proxy)
-            self.capabilities = webdriver.DesiredCapabilities.CHROME  # Driver Capabilities
-            self.create_proxy(proxy).add_to_capabilities(self.capabilities)
+            self.options.add_argument("--proxy-server=http://%s" % proxy)
             self.CreateEmail(driver=webdriver.Chrome(options=self.options, desired_capabilities=self.capabilities))
 
 
