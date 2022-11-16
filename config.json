@@ -6,8 +6,8 @@
     "Timer": true
   },
   "Captcha": {
-    "providers": "anycaptcha/twocaptcha",
-    "api_key": "",
+    "providers": "anycaptcha",
+    "api_key": "41aa9ebafb194a4db4c5cf07b2758292",
     "site_key": "B7D8911C-5CC8-A9A3-35B0-554ACEE604DA"
   },
   "EmailInfo": {
