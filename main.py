@@ -1,3 +1,5 @@
+import ctypes
+import os
 import sys
 import time
 from contextlib import suppress
@@ -5,7 +7,6 @@ from json import load
 from random import randint, choice
 from typing import Any
 
-from PyTerm import Console
 from colorama import Fore
 from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
@@ -79,7 +80,6 @@ class eGen:
                 solvedCaptcha += 1
                 return result
 
-
     def fElement(self, driver: WebDriver, by: By = By.ID, value=None, delay: float = 0.3):
         # Custom find Element Function
         count = 0
@@ -103,8 +103,9 @@ class eGen:
     def update(self):
         # Update Title Function
         global eGenerated, solvedCaptcha
-        Console.set_title(
-            f'Email Generated: {eGenerated} | Solved Captcha: {solvedCaptcha} | Balance: {self.get_balance()}')
+        title = f'Email Generated: {eGenerated} | Solved Captcha: {solvedCaptcha} | Balance: {self.get_balance()}'
+        ctypes.windll.kernel32.SetConsoleTitleW(title) if os.name == 'nt' else print(f'\33]0;{title}\a', end='',
+                                                                                     flush=True)
 
     def generate_info(self):
         # Generate Information Function
