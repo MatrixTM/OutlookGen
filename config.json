@@ -3,12 +3,13 @@
     "Prefix": "&beGen&5>> ",
     "ProxyFile": "proxy.txt",
     "OutputFile": "account.txt",
-    "Timer": true
+    "Timer": true,
+    "ProxyCheckTimeout": 2
   },
   "Captcha": {
     "providers": "anycaptcha/twocaptcha",
     "api_key": "",
-    "site_key": "B7D8911C-5CC8-A9A3-35B0-554ACEE604DA"
+    "site_key": ""
   },
   "EmailInfo": {
     "Domain": "@hotmail.com/@outlook.com",

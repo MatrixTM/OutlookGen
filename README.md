@@ -68,22 +68,23 @@ sudo apt install chromium-chromedriver
 
 ## ⚙️ Config Document
 
-| Name            | Description                                                      |
-|-----------------|------------------------------------------------------------------|
-| Prefix          | Log Prefix (Default: &beGen&5>> )                                |
-| ProxyFile       | proxy file path (Default: proxy.txt)                             |
-| OutputFile      | output file path (Default: account.txt)                          |
-| Timer           | Generate Timer (Default: true)                                   |
-| providers       | Captcha Providers (Default: anycaptcha/twocaptcha)               |
-| api_key         | Your Api Key (Default: )                                         |
-| site_key        | outlook site key (Default: B7D8911C-5CC8-A9A3-35B0-554ACEE604DA) |
-| Domain          | Email Domain (Default: @hotmail.com/@outlook.com)                |
-| minBirthDate    | Minimum BirthDate (Default: 1980)                                |
-| maxBirthDate    | Maximum BirthDate (Default: 1999)                                |
-| PasswordLength  | Password Length (Default: 10)                                    |
-| FirstNameLength | First Name Length (Default: 5)                                   |
-| LastNameLength  | Last Name Length (Default: 5)                                    |
-| DriverArguments | driver argument list (Default: ...)                              |
+| Name              | Description                                                      |
+|-------------------|------------------------------------------------------------------|
+| Prefix            | Log Prefix (Default: &beGen&5>> )                                |
+| ProxyFile         | proxy file path (Default: proxy.txt)                             |
+| OutputFile        | output file path (Default: account.txt)                          |
+| Timer             | Generate Timer (Default: true)                                   |
+| ProxyCheckTimeout | Checking Proxy Timeout (Default: 2)                              |
+| providers         | Captcha Providers (Default: anycaptcha/twocaptcha)               |
+| api_key           | Your Api Key (Default: )                                         |
+| site_key          | outlook site key (Default: B7D8911C-5CC8-A9A3-35B0-554ACEE604DA) |
+| Domain            | Email Domain (Default: @hotmail.com/@outlook.com)                |
+| minBirthDate      | Minimum BirthDate (Default: 1980)                                |
+| maxBirthDate      | Maximum BirthDate (Default: 1999)                                |
+| PasswordLength    | Password Length (Default: 10)                                    |
+| FirstNameLength   | First Name Length (Default: 5)                                   |
+| LastNameLength    | Last Name Length (Default: 5)                                    |
+| DriverArguments   | driver argument list (Default: ...)                              |
 
 </div>
 
@@ -102,7 +103,8 @@ sudo apt install chromium-chromedriver
     "Prefix": "&beGen&5>> ",
     "ProxyFile": "proxy.txt",
     "OutputFile": "account.txt",
-    "Timer": true
+    "Timer": true,
+    "ProxyCheckTimeout": 2
   },
   "Captcha": {
     "providers": "anycaptcha",

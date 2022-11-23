@@ -7,6 +7,7 @@ from json import load
 from random import randint, choice
 from typing import Any
 
+import requests
 from colorama import Fore
 from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
@@ -79,6 +80,15 @@ class eGen:
             else:
                 solvedCaptcha += 1
                 return result
+
+    def check_proxy(self, proxy):
+        with suppress(Exception):
+            requests.get("https://outlook.live.com", proxies={
+                "http": "http://{}".format(proxy),
+                "https": "http://{}".format(proxy)
+            }, timeout=self.config["ProxyCheckTimeout"])
+            return True
+        return False
 
     def fElement(self, driver: WebDriver, by: By = By.ID, value=None, delay: float = 0.3):
         # Custom find Element Function
@@ -191,6 +201,7 @@ class eGen:
             time.sleep(0.5)
             driver.execute_script(
                 'parent.postMessage(JSON.stringify({eventId:"challenge-complete",payload:{sessionToken:"' + token + '"}}),"*")')
+            self.print("&aCaptcha Solved")
             self.update()
             self.fElement(driver, By.ID, 'idBtn_Back').click()
             self.print(f'Email Created in {str(self.Timer.timer(time.time())).split(".")[0]}s') if \
@@ -199,11 +210,11 @@ class eGen:
             self.Utils.logger(self.email + self.config['EmailInfo']['Domain'], self.password)
             self.update()
             driver.quit()
-        except KeyboardInterrupt:
-            driver.quit()
-            sys.exit()
-        except:
-            self.print('&4Something is wrong :(')
+        except Exception as e:
+            if e == KeyboardInterrupt:
+                driver.quit()
+                sys.exit(0)
+            self.print("&4Something is wrong | %s" % str(e).split("\n")[0].strip())
         finally:
             driver.quit()
 
@@ -213,6 +224,10 @@ class eGen:
         while True:
             self.generate_info()
             proxy = choice(self.proxies)  # Select Proxy
+            if not self.check_proxy(proxy):
+                self.print("&c%s &f| &4Invalid Proxy&f" % proxy)
+                self.proxies.remove(proxy)
+                continue
             self.print(proxy)
             self.options.add_argument("--proxy-server=http://%s" % proxy)
             self.CreateEmail(driver=webdriver.Chrome(options=self.options, desired_capabilities=self.capabilities))
