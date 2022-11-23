@@ -1,11 +1,16 @@
 import ctypes
 import os
+import shutil
+import ssl
 import sys
 import time
 from contextlib import suppress
+from dataclasses import dataclass
 from json import load
-from random import randint, choice
+from random import randint, choice, randrange
 from typing import Any
+from urllib.parse import urlparse
+from zipfile import ZipFile
 
 import requests
 from colorama import Fore
@@ -23,9 +28,77 @@ from Utils import Utils, Timer
 eGenerated = 0
 solvedCaptcha = 0
 
+class AutoUpdater:
+    def __init__(self, version):
+        self.version = version
+        self.latest = self.get_latest()
+        self.this = os.getcwd()
+        self.file = os.getenv("TEMP")+"\latest.zip"
+        self.folder = os.getenv("TEMP")+f"\latest_{randrange(1_000_000, 999_999_999)}"
+
+    @dataclass
+    class latest_data:
+        version: str
+        zip_url: str
+
+    def get_latest(self):
+        rjson = requests.get("https://api.github.com/repos/MatrixTM/OutlookGen/tags").json()
+        return self.latest_data(version=rjson[0]["name"], zip_url=requests.get(rjson[0]["zipball_url"]).url)
+
+    @staticmethod
+    def download(host, path, filename):
+        import socket
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            context = ssl.create_default_context()
+            with context.wrap_socket(sock, server_hostname="api.github.com") as wrapped_socket:
+                wrapped_socket.connect((socket.gethostbyname(host), 443))
+                wrapped_socket.send(
+                    f"GET {path} HTTP/1.1\r\nHost:{host}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,file/avif,file/webp,file/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\n\r\n".encode())
+
+                resp = b""
+                while resp[-4:-1] != b"\r\n\r":
+                    resp += wrapped_socket.recv(1)
+                else:
+                    resp = resp.decode()
+                    content_length = int(
+                        "".join([tag.split(" ")[1] for tag in resp.split("\r\n") if "content-length" in tag.lower()]))
+                    _file = b""
+                    while content_length > 0:
+                        data = wrapped_socket.recv(2048)
+                        if not data:
+                            print("EOF")
+                            break
+                        _file += data
+                        content_length -= len(data)
+                    with open(filename, "wb") as file:
+                        file.write(_file)
+
+    def update(self):
+        if not self.version == self.latest.version:
+            print("Updating Script...")
+            parsed = urlparse(self.latest.zip_url)
+            self.download(parsed.hostname, parsed.path, self.file)
+            ZipFile(self.file).extractall(self.folder)
+            os.chdir("{}\\{}".format(self.folder, os.listdir(self.folder)[0]))
+            for files in os.listdir():
+                if os.path.isdir(files):
+                    with suppress(FileNotFoundError):
+                        shutil.rmtree("{}\\{}".format(self.this, files))
+                    shutil.copytree(files, "{}\\{}".format(self.this, files))
+                else:
+                    with suppress(FileNotFoundError):
+                        os.remove("{}\\{}".format(self.this, files))
+                    shutil.copyfile(files, "{}\\{}".format(self.this, files))
+            return
+        print("Script is up to date!")
+
+
+
 
 class eGen:
     def __init__(self):
+        self.version = "v1.1"
+        AutoUpdater(self.version).update()
         self.Utils = Utils()  # Utils Module
         self.config: Any = load(open('config.json'))  # Config File
         self.checkConfig()  # Check Config File
