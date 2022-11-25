@@ -89,6 +89,7 @@ class AutoUpdater:
                     with suppress(FileNotFoundError):
                         os.remove("{}\\{}".format(self.this, files))
                     shutil.copyfile(files, "{}\\{}".format(self.this, files))
+            exit("Run Script Again!")
             return
         print("Script is up to date!")
 
@@ -97,7 +98,7 @@ class AutoUpdater:
 
 class eGen:
     def __init__(self):
-        self.version = "v1.2"
+        self.version = "v1.2.1"
         AutoUpdater(self.version).update()
         self.Utils = Utils()  # Utils Module
         self.config: Any = load(open('config.json'))  # Config File
