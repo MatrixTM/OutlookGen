@@ -1,6 +1,7 @@
 import ctypes
 import os
 import shutil
+import socket
 import ssl
 import sys
 import time
