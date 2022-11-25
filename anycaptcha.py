@@ -212,11 +212,13 @@ class AnycaptchaClient(object):
             "clientKey": self.client_key,
             "softId": self.SOFT_ID,
         }
-        response = self.session.post(
+        response: dict = self.session.post(
             urljoin(self.base_url, self.BALANCE_URL), json=request
         ).json()
         self._check_response(response)
-        return response["balance"]
+        if "errorDescription" in response:
+            exit("Error while Checking Balance %s" % response["errorDescription"])
+        return response.get("balance", 0)
 
     def getAppStats(self, soft_id, mode):
         request = {"clientKey": self.client_key, "softId": soft_id, "mode": mode}

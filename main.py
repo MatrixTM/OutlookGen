@@ -47,7 +47,6 @@ class AutoUpdater:
 
     @staticmethod
     def download(host, path, filename):
-        import socket
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             context = ssl.create_default_context()
             with context.wrap_socket(sock, server_hostname="api.github.com") as wrapped_socket:
@@ -97,7 +96,7 @@ class AutoUpdater:
 
 class eGen:
     def __init__(self):
-        self.version = "v1.1"
+        self.version = "v1.2"
         AutoUpdater(self.version).update()
         self.Utils = Utils()  # Utils Module
         self.config: Any = load(open('config.json'))  # Config File
