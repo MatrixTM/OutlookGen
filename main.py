@@ -1,20 +1,21 @@
-import ctypes
-import os
-import shutil
-import socket
-import ssl
-import sys
-import time
+import socket as dsocket
 from contextlib import suppress
+from ctypes import windll
 from dataclasses import dataclass
 from json import load
-from random import randint, choice, randrange
+from os import getcwd, listdir, chdir, remove, mkdir, path, name
+from random import choice, randrange
+from random import randint
+from shutil import copytree, rmtree, copyfile
+from ssl import create_default_context
+from sys import exit
+from time import sleep, time
 from typing import Any
 from urllib.parse import urlparse
 from zipfile import ZipFile
 
-import requests
 from colorama import Fore
+from requests import get
 from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
@@ -22,20 +23,21 @@ from selenium.webdriver.support.select import Select
 from tqdm import tqdm
 from twocaptcha import TwoCaptcha
 
-import anycaptcha
 from Utils import Utils, Timer
+from anycaptcha import AnycaptchaClient, FunCaptchaProxylessTask
 
 # Some Value
 eGenerated = 0
 solvedCaptcha = 0
 
+
 class AutoUpdater:
     def __init__(self, version):
         self.version = version
         self.latest = self.get_latest()
-        self.this = os.getcwd()
-        self.file = os.getenv("TEMP")+"\latest.zip"
-        self.folder = os.getenv("TEMP")+f"\latest_{randrange(1_000_000, 999_999_999)}"
+        self.this = getcwd()
+        self.file = "temp/latest.zip"
+        self.folder = f"temp/latest_{randrange(1_000_000, 999_999_999)}"
 
     @dataclass
     class latest_data:
@@ -43,17 +45,17 @@ class AutoUpdater:
         zip_url: str
 
     def get_latest(self):
-        rjson = requests.get("https://api.github.com/repos/MatrixTM/OutlookGen/tags").json()
-        return self.latest_data(version=rjson[0]["name"], zip_url=requests.get(rjson[0]["zipball_url"]).url)
+        rjson = get("https://api.github.com/repos/MatrixTM/OutlookGen/tags").json()
+        return self.latest_data(version=rjson[0]["name"], zip_url=get(rjson[0]["zipball_url"]).url)
 
     @staticmethod
-    def download(host, path, filename):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            context = ssl.create_default_context()
+    def download(host, dPath, filename):
+        with dsocket.socket(dsocket.AF_INET, dsocket.SOCK_STREAM) as sock:
+            context = create_default_context()
             with context.wrap_socket(sock, server_hostname="api.github.com") as wrapped_socket:
-                wrapped_socket.connect((socket.gethostbyname(host), 443))
+                wrapped_socket.connect((dsocket.gethostbyname(host), 443))
                 wrapped_socket.send(
-                    f"GET {path} HTTP/1.1\r\nHost:{host}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,file/avif,file/webp,file/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\n\r\n".encode())
+                    f"GET {dPath} HTTP/1.1\r\nHost:{host}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,file/avif,file/webp,file/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\n\r\n".encode())
 
                 resp = b""
                 while resp[-4:-1] != b"\r\n\r":
@@ -75,30 +77,33 @@ class AutoUpdater:
 
     def update(self):
         if not self.version == self.latest.version:
+            rmtree("temp") if path.exists("temp") else ""
+            mkdir("temp")
             print("Updating Script...")
             parsed = urlparse(self.latest.zip_url)
             self.download(parsed.hostname, parsed.path, self.file)
             ZipFile(self.file).extractall(self.folder)
-            os.chdir("{}\\{}".format(self.folder, os.listdir(self.folder)[0]))
-            for files in os.listdir():
-                if os.path.isdir(files):
+            print(path.exists(self.folder))
+            print(path.exists(listdir(self.folder)[0]))
+            chdir("{}/{}".format(self.folder, listdir(self.folder)[0]))
+            for files in listdir():
+                if path.isdir(files):
                     with suppress(FileNotFoundError):
-                        shutil.rmtree("{}\\{}".format(self.this, files))
-                    shutil.copytree(files, "{}\\{}".format(self.this, files))
+                        rmtree("{}/{}".format(self.this, files))
+                    copytree(files, "{}/{}".format(self.this, files))
                 else:
                     with suppress(FileNotFoundError):
-                        os.remove("{}\\{}".format(self.this, files))
-                    shutil.copyfile(files, "{}\\{}".format(self.this, files))
+                        remove("{}/{}".format(self.this, files))
+                    copyfile(files, "{}/{}".format(self.this, files))
+            rmtree("../../../temp")
             exit("Run Script Again!")
             return
         print("Script is up to date!")
 
 
-
-
 class eGen:
     def __init__(self):
-        self.version = "v1.2.1"
+        self.version = "v1.2.2"
         AutoUpdater(self.version).update()
         self.Utils = Utils()  # Utils Module
         self.config: Any = load(open('config.json'))  # Config File
@@ -123,7 +128,7 @@ class eGen:
         for arg in tqdm(self.config["DriverArguments"], desc='Loading Arguments',
                         bar_format='{desc} | {l_bar}{bar:15} | {percentage:3.0f}%'):  # Get Driver Arguments
             self.options.add_argument(arg)  # Add Argument to option
-            time.sleep(0.2)
+            sleep(0.2)
 
         # More Options
         self.options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -142,8 +147,8 @@ class eGen:
 
             # AnyCaptcha
         elif self.providers == 'anycaptcha':
-            client = anycaptcha.AnycaptchaClient(self.api_key)
-            task = anycaptcha.FunCaptchaProxylessTask(site_url, self.site_key)
+            client = AnycaptchaClient(self.api_key)
+            task = FunCaptchaProxylessTask(site_url, self.site_key)
             job = client.createTask(task, typecaptcha="funcaptcha")
             self.print("Solving funcaptcha")
             job.join()
@@ -157,7 +162,7 @@ class eGen:
 
     def check_proxy(self, proxy):
         with suppress(Exception):
-            requests.get("https://outlook.live.com", proxies={
+            get("https://outlook.live.com", proxies={
                 "http": "http://{}".format(proxy),
                 "https": "http://{}".format(proxy)
             }, timeout=self.config["ProxyCheckTimeout"])
@@ -168,11 +173,10 @@ class eGen:
         # Custom find Element Function
         count = 0
         while count <= 100:
-            try:
+            with suppress(Exception):
                 return driver.find_element(by, value)
-            except:
-                time.sleep(delay)
-                count += 1
+            sleep(delay)
+            count += 1
         self.print(f'tried 100 time to find element...')
         driver.quit()
         return
@@ -182,14 +186,14 @@ class eGen:
         if self.providers == 'twocaptcha':
             return TwoCaptcha(self.api_key).balance()
         elif self.providers == 'anycaptcha':
-            return anycaptcha.AnycaptchaClient(self.api_key).getBalance()
+            return AnycaptchaClient(self.api_key).getBalance()
 
     def update(self):
         # Update Title Function
         global eGenerated, solvedCaptcha
         title = f'Email Generated: {eGenerated} | Solved Captcha: {solvedCaptcha} | Balance: {self.get_balance()}'
-        ctypes.windll.kernel32.SetConsoleTitleW(title) if os.name == 'nt' else print(f'\33]0;{title}\a', end='',
-                                                                                     flush=True)
+        windll.kernel32.SetConsoleTitleW(title) if name == 'nt' else print(f'\33]0;{title}\a', end='',
+                                                                           flush=True)
 
     def generate_info(self):
         # Generate Information Function
@@ -204,7 +208,7 @@ class eGen:
         if captcha_sec['api_key'] == "" or captcha_sec['providers'] == "anycaptcha/twocaptcha" or \
                 self.config['EmailInfo']['Domain'] == "@hotmail.com/@outlook.com":
             self.print('Please Fix Config!')
-            sys.exit()
+            exit()
 
     def print(self, text: object, end: str = "\n"):
         # Print With Prefix Function
@@ -232,12 +236,12 @@ class eGen:
             global eGenerated, solvedCaptcha
             self.update()
             driver.set_page_load_timeout(5)
-            self.Timer.start(time.time()) if self.config["Common"]['Timer'] else ''
+            self.Timer.start(time()) if self.config["Common"]['Timer'] else ''
             driver.get("https://outlook.live.com/owa/?nlp=1&signup=1")
             assert 'Create' in driver.title
             if self.config['EmailInfo']['Domain'] == "@hotmail.com":
                 domain = self.fElement(driver, By.ID, 'LiveDomainBoxList')
-                time.sleep(0.1)
+                sleep(0.1)
                 domainObject = Select(domain)
                 domainObject.select_by_value('hotmail.com')
             emailInput = self.fElement(driver, By.ID, 'MemberName')
@@ -272,13 +276,13 @@ class eGen:
             self.fElement(driver, By.ID, 'iSignupAction').click()
             driver.switch_to.frame(self.fElement(driver, By.ID, 'enforcementFrame'))
             token = self.solver(driver.current_url, self.driver)
-            time.sleep(0.5)
+            sleep(0.5)
             driver.execute_script(
                 'parent.postMessage(JSON.stringify({eventId:"challenge-complete",payload:{sessionToken:"' + token + '"}}),"*")')
             self.print("&aCaptcha Solved")
             self.update()
             self.fElement(driver, By.ID, 'idBtn_Back').click()
-            self.print(f'Email Created in {str(self.Timer.timer(time.time())).split(".")[0]}s') if \
+            self.print(f'Email Created in {str(self.Timer.timer(time())).split(".")[0]}s') if \
                 self.config["Common"]['Timer'] else self.print('Email Created')
             eGenerated += 1
             self.Utils.logger(self.email + self.config['EmailInfo']['Domain'], self.password)
@@ -287,7 +291,7 @@ class eGen:
         except Exception as e:
             if e == KeyboardInterrupt:
                 driver.quit()
-                sys.exit(0)
+                exit(0)
             self.print("&4Something is wrong | %s" % str(e).split("\n")[0].strip())
         finally:
             driver.quit()
