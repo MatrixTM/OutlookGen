@@ -90,7 +90,6 @@ sudo apt install chromium-chromedriver
 
 #### Change this configs
 
-- driverPath
 - providers
 - api_key
 - Domain
