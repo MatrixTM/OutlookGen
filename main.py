@@ -103,7 +103,7 @@ class AutoUpdater:
 
 class eGen:
     def __init__(self):
-        self.version = "v1.2.2"
+        self.version = "v1.2.3"
         AutoUpdater(self.version).update()
         self.Utils = Utils()  # Utils Module
         self.config: Any = load(open('config.json'))  # Config File
@@ -165,7 +165,7 @@ class eGen:
             get("https://outlook.live.com", proxies={
                 "http": "http://{}".format(proxy),
                 "https": "http://{}".format(proxy)
-            }, timeout=self.config["ProxyCheckTimeout"])
+            }, timeout=self.config["Common"]["ProxyCheckTimeout"] or 5)
             return True
         return False
 
@@ -235,7 +235,6 @@ class eGen:
         try:
             global eGenerated, solvedCaptcha
             self.update()
-            driver.set_page_load_timeout(5)
             self.Timer.start(time()) if self.config["Common"]['Timer'] else ''
             driver.get("https://outlook.live.com/owa/?nlp=1&signup=1")
             assert 'Create' in driver.title
@@ -259,6 +258,7 @@ class eGen:
             self.fElement(driver, By.ID, 'iSignupAction').click()
             first = self.fElement(driver, By.ID, "FirstName")
             first.send_keys(self.first_name)
+            sleep(.3)
             last = self.fElement(driver, By.ID, "LastName")
             last.send_keys(self.last_name)
             self.fElement(driver, By.ID, 'iSignupAction').click()
@@ -299,16 +299,19 @@ class eGen:
     def run(self):
         # Run Script Function
         self.print('&bCoded with &c<3&b by MatrixTeam')
-        while True:
-            self.generate_info()
-            proxy = choice(self.proxies)  # Select Proxy
-            if not self.check_proxy(proxy):
-                self.print("&c%s &f| &4Invalid Proxy&f" % proxy)
-                self.proxies.remove(proxy)
-                continue
-            self.print(proxy)
-            self.options.add_argument("--proxy-server=http://%s" % proxy)
-            self.CreateEmail(driver=webdriver.Chrome(options=self.options, desired_capabilities=self.capabilities))
+        with suppress(IndexError):
+            while True:
+                    self.generate_info()
+                    proxy = choice(self.proxies)  # Select Proxy
+                    if not self.check_proxy(proxy):
+                        self.print("&c%s &f| &4Invalid Proxy&f" % proxy)
+                        self.proxies.remove(proxy)
+                        continue
+                    self.print(proxy)
+                    self.options.add_argument("--proxy-server=http://%s" % proxy)
+                    self.CreateEmail(driver=webdriver.Chrome(options=self.options, desired_capabilities=self.capabilities))
+        self.print("&4No Proxy Available, Exiting!")
+
 
 
 if __name__ == '__main__':
