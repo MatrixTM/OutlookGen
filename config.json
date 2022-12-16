@@ -28,6 +28,7 @@
     "--disable-blink-features=AutomationControlled",
     "--disable-gpu",
     "--headless",
-    "--no-sandbox"
+    "--no-sandbox",
+    "--lang=en"
   ]
 }
