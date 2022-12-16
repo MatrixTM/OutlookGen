@@ -103,7 +103,7 @@ class AutoUpdater:
 
 class eGen:
     def __init__(self):
-        self.version = "v1.2.3"
+        self.version = "v1.2.4"
         AutoUpdater(self.version).update()
         self.Utils = Utils()  # Utils Module
         self.config: Any = load(open('config.json'))  # Config File
