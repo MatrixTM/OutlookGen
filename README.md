@@ -134,6 +134,6 @@ sudo apt install chromium-chromedriver
 
 ## Need a Cheap Server? No Problem
 
-<a href="https://aeza.net/?ref=375036"><img src="https://aeza.net/_next/static/media/a.9a01553c.svg" width="128" height="128" alt="aeza"></a>
+<a href="https://aeza.net/?ref=375036"><img src="https://i.ibb.co/LthJcL8/image.png" width="728" height="90" alt="aeza"></a>
 
 #### You can buy an 10Gbps/Cheap server from [Aeza Hosting](https://aeza.net/?ref=375036) with crypto (100% anonymous).
