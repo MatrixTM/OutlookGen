@@ -1,6 +1,6 @@
 selenium==4.6.0
 six~=1.16.0
-requests~=2.31.0
+requests~=2.32.2
 unique-names-generator~=1.0.2
 colorama==0.4.6
 tqdm==4.64.1
